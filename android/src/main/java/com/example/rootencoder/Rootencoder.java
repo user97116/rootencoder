@@ -1,5 +1,6 @@
 package com.example.rootencoder;
 
+
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -59,8 +60,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     Rootencoder(Context context, BinaryMessenger messenger, int id) {
         bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
-        bitmap.setWidth(10);
-        bitmap.setHeight(10);
         folder = PathUtils.getRecordPath();
         openGlView = new OpenGlView(context);
         rtmpCamera1 = new RtmpCamera1(openGlView, this);
@@ -546,16 +545,16 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     void addTextToStream(MethodCall methodCall, Result result) {
         String value =   (String) methodCall.arguments;
         TextObjectFilterRender textObjectFilterRender = new TextObjectFilterRender();
-        rtmpCamera1.getGlInterface().setFilter(textObjectFilterRender);
-        textObjectFilterRender.setText(value, 64, Color.RED);
+        rtmpCamera1.getGlInterface().addFilter(textObjectFilterRender);
+        textObjectFilterRender.setText(value, 32, Color.RED);
         textObjectFilterRender.setDefaultScale(rtmpCamera1.getStreamWidth(),
                 rtmpCamera1.getStreamHeight());
-        textObjectFilterRender.setPosition(TranslateTo.CENTER);
+        textObjectFilterRender.setPosition(TranslateTo.BOTTOM);
     }
 
     void addImageToStream(MethodCall methodCall, Result result) {
         ImageObjectFilterRender imageObjectFilterRender = new ImageObjectFilterRender();
-        rtmpCamera1.getGlInterface().setFilter(imageObjectFilterRender);
+        rtmpCamera1.getGlInterface().addFilter(imageObjectFilterRender);
         imageObjectFilterRender.setImage(bitmap);
         imageObjectFilterRender.setDefaultScale(rtmpCamera1.getStreamWidth(), rtmpCamera1.getStreamHeight());
         imageObjectFilterRender.setPosition(TranslateTo.TOP_RIGHT);
