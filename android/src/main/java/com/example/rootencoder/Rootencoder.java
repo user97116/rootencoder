@@ -1,9 +1,13 @@
 package com.example.rootencoder;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -24,9 +28,12 @@ import androidx.annotation.NonNull;
 import com.pedro.common.ConnectChecker;
 import com.pedro.common.VideoCodec;
 import com.pedro.encoder.input.audio.MicrophoneMode;
+import com.pedro.encoder.input.gl.render.filters.object.ImageObjectFilterRender;
 import com.pedro.encoder.input.gl.render.filters.object.TextObjectFilterRender;
+import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.encoder.utils.gl.TranslateTo;
 import com.pedro.library.rtmp.RtmpCamera1;
+import com.pedro.library.view.OpenGlView;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +46,6 @@ import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.platform.PlatformView;
 
 public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHolder.Callback, ConnectChecker, View.OnTouchListener {
-    private final SurfaceView surfaceView;
     private final RtmpCamera1 rtmpCamera1;
     private File folder;
     private String currentDateAndTime = "123";
@@ -48,14 +54,26 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private final EventChannel eventChannel2;
     private EventChannel.EventSink eventSink;
     private EventChannel.EventSink eventSink2;
+    private OpenGlView openGlView;
+    private Bitmap bitmap;
 
     Rootencoder(Context context, BinaryMessenger messenger, int id) {
+        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
         folder = PathUtils.getRecordPath();
-        surfaceView = new SurfaceView(context);
-        rtmpCamera1 = new RtmpCamera1(surfaceView, this);
-        rtmpCamera1.getStreamClient().setReTries(10);
-        surfaceView.getHolder().addCallback(this);
+        openGlView = new OpenGlView(context);
+        rtmpCamera1 = new RtmpCamera1(openGlView, this);
+//        openGlView.getHolder().addCallback(this);
+        openGlView.setOnTouchListener(this);
+        if (openGlView.getHolder().getSurface().isValid()) {
+            try {
+                rtmpCamera1.startPreview();
+            } catch (CameraOpenException e) {
+                e.printStackTrace();
+            }
+        }
 
+
+        rtmpCamera1.getStreamClient().setReTries(10);
         methodChannel = new MethodChannel(messenger, "rootencoder");
         methodChannel.setMethodCallHandler(this);
 
@@ -89,7 +107,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public View getView() {
-        return surfaceView;
+        return openGlView;
     }
 
     @Override
@@ -98,18 +116,23 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             case "switchCamera":
                 switchCamera(methodCall, result);
                 break;
+
             case "startRecord":
                 startRecord(methodCall, result);
                 break;
+
             case "startStream":
                 startStream(methodCall, result);
                 break;
+
             case "stopRecord":
                 stopRecord(methodCall, result);
                 break;
+
             case "stopStream":
                 stopStream(methodCall, result);
                 break;
+
             case "close":
                 close();
                 break;
@@ -117,12 +140,15 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             case "setVideoBitrateOnFly":
                 setVideoBitrateOnFly(methodCall, result);
                 break;
+
             case "setZoom":
                 setZoom(methodCall, result);
                 break;
+
             case "setLimitFPSOnFly":
                 setLimitFPSOnFly(methodCall, result);
                 break;
+
             case "setMicrophoneMode":
                 setMicrophoneMode(methodCall, result);
                 break;
@@ -131,16 +157,13 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 setExposure(methodCall, result);
                 break;
 
-
             case "setVideoCodec":
                 setVideoCodec(methodCall, result);
                 break;
 
-
             case "disableVideoStabilization":
                 disableVideoStabilization(methodCall, result);
                 break;
-
 
             case "enableVideoStabilization":
                 enableVideoStabilization(methodCall, result);
@@ -150,11 +173,9 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 enableAudio(methodCall, result);
                 break;
 
-
             case "disableAudio":
                 disableAudio(methodCall, result);
                 break;
-
 
             case "disableAutoFocus":
                 disableAutoFocus(methodCall, result);
@@ -167,12 +188,15 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             case "resumeRecord":
                 resumeRecord(methodCall, result);
                 break;
+
             case "pauseRecord":
                 pauseRecord(methodCall, result);
                 break;
+
             case "isAudioMuted":
                 isAudioMuted(methodCall, result);
                 break;
+
             case "isRecording":
                 isRecording(methodCall, result);
                 break;
@@ -181,31 +205,30 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 isStreaming(methodCall, result);
                 break;
 
-
             case "getMaxZoom":
                 getMaxZoom(methodCall, result);
                 break;
+
             case "getMaxExposure":
                 getMaxExposure(methodCall, result);
                 break;
-
 
             case "getMinExposure":
                 getMinExposure(methodCall, result);
                 break;
 
-
             case "getZoom":
                 getZoom(methodCall, result);
                 break;
+
             case "getBitrate":
                 getBitrate(methodCall, result);
                 break;
 
-
             case "getRecordStatus":
                 getRecordStatus(methodCall, result);
                 break;
+
             case "getSupportedFps":
                 getSupportedFps(methodCall, result);
                 break;
@@ -218,7 +241,15 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 isOnPreview(methodCall, result);
                 break;
 
-
+            case "addTextToStream":
+                addTextToStream(methodCall, result);
+                break;
+            case "clearFilterFromStream":
+                clearFilterFromStream(methodCall, result);
+                break;
+            case "addImageToStream":
+                addImageToStream(methodCall,result);
+                break;
             default:
                 result.notImplemented();
         }
@@ -295,7 +326,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        rtmpCamera1.startPreview();
+//        rtmpCamera1.startPreview();
     }
 
     @Override
@@ -509,13 +540,27 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         }
         return true;
     }
-    void s(){
+
+    void addTextToStream(MethodCall methodCall, Result result) {
+        String value =   (String) methodCall.arguments;
         TextObjectFilterRender textObjectFilterRender = new TextObjectFilterRender();
         rtmpCamera1.getGlInterface().setFilter(textObjectFilterRender);
-        textObjectFilterRender.setText("Hello world", 22, Color.RED);
+        textObjectFilterRender.setText(value, 64, Color.RED);
         textObjectFilterRender.setDefaultScale(rtmpCamera1.getStreamWidth(),
                 rtmpCamera1.getStreamHeight());
         textObjectFilterRender.setPosition(TranslateTo.CENTER);
+    }
+
+    void addImageToStream(MethodCall methodCall, Result result) {
+        ImageObjectFilterRender imageObjectFilterRender = new ImageObjectFilterRender();
+        rtmpCamera1.getGlInterface().setFilter(imageObjectFilterRender);
+        imageObjectFilterRender.setImage(bitmap);
+        imageObjectFilterRender.setDefaultScale(rtmpCamera1.getStreamWidth(), rtmpCamera1.getStreamHeight());
+        imageObjectFilterRender.setPosition(TranslateTo.RIGHT);
+    }
+
+    void clearFilterFromStream(MethodCall methodCall, Result result) {
+        rtmpCamera1.getGlInterface().clearFilters();
     }
 }
 

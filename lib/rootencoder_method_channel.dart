@@ -17,10 +17,6 @@ class MethodChannelRootencoder implements RootencoderPlatform {
   Future<String?> getPlatformVersion() async {
     final version =
         await methodChannel.invokeMethod<String>('getPlatformVersion');
-    const eventChannel = EventChannel("rootencoder2");
-    eventChannel.receiveBroadcastStream().listen((event) {
-      print(event);
-    });
     return version;
   }
 
