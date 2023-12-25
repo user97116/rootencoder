@@ -59,6 +59,8 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     Rootencoder(Context context, BinaryMessenger messenger, int id) {
         bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
+        bitmap.setWidth(10);
+        bitmap.setHeight(10);
         folder = PathUtils.getRecordPath();
         openGlView = new OpenGlView(context);
         rtmpCamera1 = new RtmpCamera1(openGlView, this);
@@ -556,7 +558,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         rtmpCamera1.getGlInterface().setFilter(imageObjectFilterRender);
         imageObjectFilterRender.setImage(bitmap);
         imageObjectFilterRender.setDefaultScale(rtmpCamera1.getStreamWidth(), rtmpCamera1.getStreamHeight());
-        imageObjectFilterRender.setPosition(TranslateTo.RIGHT);
+        imageObjectFilterRender.setPosition(TranslateTo.TOP_RIGHT);
     }
 
     void clearFilterFromStream(MethodCall methodCall, Result result) {
