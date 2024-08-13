@@ -3,8 +3,8 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:rootencoder/rootencoder.dart';
-import 'package:rootencoder/text_view.dart';
+import 'package:rootencoder_android/rootencoder.dart';
+import 'package:rootencoder_android/text_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +18,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _rootencoderPlugin = Rootencoder();
+  // final _rootencoderPlugin = Rootencoder();
   MethodChannel methodChannel = const MethodChannel('rootencoder');
   @override
   void initState() {
@@ -30,7 +30,7 @@ class _MyAppState extends State<MyApp> {
     await Permission.camera.request();
     await Permission.microphone.request();
     await Permission.storage.request();
-    initPlatformState();
+    // initPlatformState();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.

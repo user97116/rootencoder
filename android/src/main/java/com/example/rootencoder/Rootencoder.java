@@ -1,6 +1,7 @@
 package com.example.rootencoder;
 
-
+import android.util.Log;
+import android.view.WindowManager;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -16,7 +17,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import io.flutter.Log;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.platform.PlatformView;
@@ -58,23 +59,20 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private OpenGlView openGlView;
     private Bitmap bitmap;
 
+    @Override
+    public void onFlutterViewAttached(@NonNull View flutterView) {
+        PlatformView.super.onFlutterViewAttached(flutterView);
+        openGlView.getHolder().addCallback(this);
+        openGlView.setOnTouchListener(this);
+
+    }
+
     Rootencoder(Context context, BinaryMessenger messenger, int id) {
         bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
         folder = PathUtils.getRecordPath();
         openGlView = new OpenGlView(context);
         rtmpCamera1 = new RtmpCamera1(openGlView, this);
-//        openGlView.getHolder().addCallback(this);
-        openGlView.setOnTouchListener(this);
-        if (openGlView.getHolder().getSurface().isValid()) {
-            try {
-                rtmpCamera1.startPreview();
-            } catch (CameraOpenException e) {
-                e.printStackTrace();
-            }
-        }
 
-
-        rtmpCamera1.getStreamClient().setReTries(10);
         methodChannel = new MethodChannel(messenger, "rootencoder");
         methodChannel.setMethodCallHandler(this);
 
@@ -113,6 +111,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+
         switch (methodCall.method) {
             case "switchCamera":
                 switchCamera(methodCall, result);
@@ -261,6 +260,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         try {
             rtmpCamera1.switchCamera();
         } catch (Exception e) {
+            Log.d("ERROR",e.getMessage());
         }
         result.success(null);
     }
@@ -322,17 +322,35 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
-
+        Log.d("STATUS", String.valueOf(surfaceHolder.getSurface().isValid()));
+        if (surfaceHolder.getSurface().isValid()) {
+            Log.d("Valid","yes");
+            try {
+                rtmpCamera1.startPreview();
+                rtmpCamera1.getStreamClient().setReTries(10);
+            } catch (CameraOpenException e) {
+               Log.d("Camera can't attached","yes");
+            }
+        }
     }
 
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-//        rtmpCamera1.startPreview();
+        if (rtmpCamera1 != null) {
+            rtmpCamera1.stopPreview();
+            try {
+                rtmpCamera1.startPreview();
+            } catch (Exception e) {
+               Log.d("surfaceChanged","can't preview");
+            }
+        }
     }
 
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
-
+        if (rtmpCamera1 != null) {
+            rtmpCamera1.stopPreview();
+        }
     }
 
 
