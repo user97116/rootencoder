@@ -182,11 +182,17 @@ class MethodChannelRootencoder implements RootencoderPlatform {
   
   @override
   Stream connectionStream() {
-    return const EventChannel('connectionStream').receiveBroadcastStream();
+     if (defaultTargetPlatform == TargetPlatform.android)
+      return const EventChannel('connectionStream').receiveBroadcastStream();
+    else
+      return const EventChannel('connectionStream').receiveBroadcastStream("connectionStream");
   }
 
   @override
   Stream connection() {
-    return const EventChannel('connection').receiveBroadcastStream();
+   if (defaultTargetPlatform == TargetPlatform.android)
+      return const EventChannel('connection').receiveBroadcastStream();
+    else 
+      return const EventChannel('connection').receiveBroadcastStream("connection");
   }
 }

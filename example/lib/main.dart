@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:rootencoder_android/rootencoder.dart';
+import 'package:rootencoder_android/rootencoder_method_channel.dart';
 import 'package:rootencoder_android/text_view.dart';
 
 void main() {
@@ -30,11 +30,20 @@ class _MyAppState extends State<MyApp> {
     await Permission.camera.request();
     await Permission.microphone.request();
     await Permission.storage.request();
-    // initPlatformState();
+    initPlatformState();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
+    String? v =  await MethodChannelRootencoder().getPlatformVersion();
+        print(v);
+    urlController.text  = v!;
+     MethodChannelRootencoder().connection().listen((c){
+      print("sdsd $c");
+     });
+    MethodChannelRootencoder().connectionStream().listen((c){
+        print("sds2sd $c");
+    });
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     // try {
@@ -48,18 +57,21 @@ class _MyAppState extends State<MyApp> {
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
     if (!mounted) return;
-
-    setState(() {});
+   
+    setState(()  {
+    
+    });
   }
 
   final TextEditingController urlController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    print(urlController.text);
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title:  Text('Plugin example app'  ),
         ),
         body: Center(
           child: Column(
@@ -75,7 +87,9 @@ class _MyAppState extends State<MyApp> {
               ),
               TextButton(
                 onPressed: () {
-                  methodChannel.invokeMethod("switchCamera");
+                  methodChannel.invokeMethod("switchCamera", "test stream").then((v){
+                    print("switchCamera: "+v);
+                  });
                 },
                 child: const Text("Switch camera"),
               ),

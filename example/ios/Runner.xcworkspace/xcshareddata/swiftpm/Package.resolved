@@ -1,0 +1,15 @@
+{
+  "originHash" : "fb0f7add8f4d4cc9fecc4a6b909a7cce14fc74d5660615097a651d78a7bee09f",
+  "pins" : [
+    {
+      "identity" : "rootencoder-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pedroSG94/RootEncoder-iOS",
+      "state" : {
+        "revision" : "83952e953cd143204fa48a222cc4eb9f86b08440",
+        "version" : "0.0.9"
+      }
+    }
+  ],
+  "version" : 3
+}

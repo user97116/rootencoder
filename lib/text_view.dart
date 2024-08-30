@@ -21,8 +21,10 @@ class _TextViewState extends State<TextView> {
         onPlatformViewCreated: _onPlatformViewCreated,
       );
     }
-    return Text(
-        '$defaultTargetPlatform is not yet supported by the text_view plugin');
+    return UiKitView(
+      viewType: 'com.amar/rootencoder',
+      onPlatformViewCreated: _onPlatformViewCreated,
+    );
   }
 
   void _onPlatformViewCreated(int id) {

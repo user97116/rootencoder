@@ -1,0 +1,53 @@
+PODS:
+  - Alamofire (5.9.1)
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - permission_handler_apple (9.1.1):
+    - Flutter
+  - RootEncoder (0.0.9)
+  - rootencoder_android (0.0.1):
+    - Alamofire
+    - Flutter
+    - RootEncoder
+
+DEPENDENCIES:
+  - Alamofire
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - RootEncoder (from `/Users/amar/Documents/GitHub/temples/rootencoder/example/ios/RootEncoder`)
+  - rootencoder_android (from `.symlinks/plugins/rootencoder_android/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
+  RootEncoder:
+    :git: "/Users/amar/Documents/GitHub/temples/rootencoder/example/ios/RootEncoder"
+  rootencoder_android:
+    :path: ".symlinks/plugins/rootencoder_android/ios"
+
+CHECKOUT OPTIONS:
+  RootEncoder:
+    :commit: b11b16c9709550cae73fcaeb847568bed4c8a6b5
+    :git: "/Users/amar/Documents/GitHub/temples/rootencoder/example/ios/RootEncoder"
+
+SPEC CHECKSUMS:
+  Alamofire: f36a35757af4587d8e4f4bfa223ad10be2422b8c
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
+  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
+  RootEncoder: 4c5704d16e13d9fda7d7b8ed172fa619577050da
+  rootencoder_android: 2ce22d253f7921b8de97b22d4fa26ae38ba4e555
+
+PODFILE CHECKSUM: e9fe9e8243a77414b48c3582540d1d187895cc87
+
+COCOAPODS: 1.15.2
