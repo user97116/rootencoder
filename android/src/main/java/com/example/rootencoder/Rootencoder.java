@@ -334,6 +334,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (surfaceHolder.getSurface().isValid()) {
             Log.d("Valid","yes");
             try {
+                openGlView.setAspectRatioMode(AspectRatioMode.Fill);
                 rtmpCamera1.startPreview();
                 rtmpCamera1.getStreamClient().setReTries(10);
             } catch (CameraOpenException e) {
