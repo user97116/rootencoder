@@ -72,7 +72,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
         folder = PathUtils.getRecordPath();
         openGlView = new OpenGlView(context);
-        openGlView.setAspectRatioMode(AspectRatioMode.Fill);
+//        openGlView.setAspectRatioMode(AspectRatioMode.Fill);
         rtmpCamera1 = new RtmpCamera1(openGlView, this);
 
         methodChannel = new MethodChannel(messenger, "rootencoder");
