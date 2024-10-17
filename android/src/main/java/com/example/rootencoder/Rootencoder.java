@@ -72,6 +72,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         folder = PathUtils.getRecordPath();
         openGlView = new OpenGlView(context);
         rtmpCamera1 = new RtmpCamera1(openGlView, this);
+        rtmpCamera1.setPreviewOrientation(180);
 
         methodChannel = new MethodChannel(messenger, "rootencoder");
         methodChannel.setMethodCallHandler(this);
