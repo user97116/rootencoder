@@ -32,6 +32,7 @@ import com.pedro.encoder.input.audio.MicrophoneMode;
 import com.pedro.encoder.input.gl.render.filters.object.ImageObjectFilterRender;
 import com.pedro.encoder.input.gl.render.filters.object.TextObjectFilterRender;
 import com.pedro.encoder.input.video.CameraOpenException;
+import com.pedro.encoder.utils.gl.AspectRatioMode;
 import com.pedro.encoder.utils.gl.TranslateTo;
 import com.pedro.library.rtmp.RtmpCamera1;
 import com.pedro.library.view.OpenGlView;
