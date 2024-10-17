@@ -114,7 +114,12 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
         switch (methodCall.method) {
             case "screen":
-                rtmpCamera1.setPreviewOrientation((int)methodCall.arguments);
+               try {
+                   rtmpCamera1.setPreviewOrientation((int)methodCall.arguments);
+                   result.success("Success");
+               }catch (Exception e){
+                   result.success(null);
+               }
                 break;
             case "switchCamera":
                 switchCamera(methodCall, result);
