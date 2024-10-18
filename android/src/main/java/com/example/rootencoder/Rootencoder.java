@@ -37,9 +37,11 @@ import com.pedro.encoder.input.gl.render.filters.object.TextObjectFilterRender;
 import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.encoder.input.video.facedetector.Face;
 import com.pedro.encoder.input.video.facedetector.FaceDetectorCallback;
+import com.pedro.encoder.utils.CodecUtil;
 import com.pedro.encoder.utils.gl.AspectRatioMode;
 import com.pedro.encoder.utils.gl.TranslateTo;
 import com.pedro.library.rtmp.RtmpCamera1;
+import com.pedro.library.rtmp.RtmpCamera2;
 import com.pedro.library.view.OpenGlView;
 
 import java.io.File;
@@ -54,7 +56,7 @@ import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.platform.PlatformView;
 
 public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHolder.Callback, ConnectChecker, View.OnTouchListener {
-    private final RtmpCamera1 rtmpCamera1;
+    private final RtmpCamera2 rtmpCamera1;
     private final MethodChannel methodChannel;
     private final EventChannel eventChannel;
     private final EventChannel eventChannel2;
@@ -78,8 +80,8 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
 
         openGlView = new OpenGlView(context);
-        rtmpCamera1 = new RtmpCamera1(openGlView, this);
-
+        rtmpCamera1 = new RtmpCamera2(openGlView, this);
+        rtmpCamera1.setForce(CodecUtil.Force.SOFTWARE, CodecUtil.Force.FIRST_COMPATIBLE_FOUND);
         methodChannel = new MethodChannel(messenger, "rootencoder");
         methodChannel.setMethodCallHandler(this);
 
@@ -277,6 +279,9 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private void changeResolution(MethodCall methodCall, Result result) {
         width = (int) methodCall.argument("width");
         height = (int) methodCall.argument("height");
+        for (int i = 0;i <rtmpCamera1.getResolutionsBack().toArray().length; i++)
+            Log.d("amar",String.valueOf(rtmpCamera1.getResolutionsBack().get(i).getWidth())+"x"+String.valueOf(rtmpCamera1.getResolutionsBack().get(i).getHeight()));
+//        Log.d("amar",String.valueOf(rtmpCamera1.prepareVideo(width,height,1200 * 1024)));
         result.success("changed with stop stream and record");
     }
 
@@ -330,7 +335,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
         Log.d("STATUS", String.valueOf(surfaceHolder.getSurface().isValid()));
-        if (surfaceHolder.getSurface().isValid()) {
+        if (surfaceHolder.getSurface().isValid() && !rtmpCamera1.isOnPreview()) {
             Log.d("Valid", "yes");
             try {
                 rtmpCamera1.startPreview();
@@ -344,9 +349,11 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         if (rtmpCamera1 != null) {
-            rtmpCamera1.stopPreview();
+            if (rtmpCamera1.isOnPreview())
+                rtmpCamera1.stopPreview();
             try {
-                rtmpCamera1.startPreview();
+                if (!rtmpCamera1.isOnPreview())
+                    rtmpCamera1.startPreview();
             } catch (Exception e) {
                 Log.d("surfaceChanged", "can't preview");
             }
@@ -355,7 +362,8 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
-        if (rtmpCamera1 != null) {
+        if (rtmpCamera1 != null && rtmpCamera1.isOnPreview()
+        ) {
             rtmpCamera1.stopPreview();
         }
     }
@@ -368,7 +376,8 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (rtmpCamera1.isStreaming()) {
             rtmpCamera1.stopStream();
         }
-        rtmpCamera1.stopPreview();
+        if(rtmpCamera1.isOnPreview())
+            rtmpCamera1.stopPreview();
     }
 
     @Override
@@ -508,7 +517,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     }
 
     private void getMaxZoom(MethodCall methodCall, Result result) {
-        int maxZoom = rtmpCamera1.getMaxZoom();
+        float maxZoom = rtmpCamera1.getZoom();
         result.success(maxZoom);
     }
 
@@ -560,7 +569,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 rtmpCamera1.setZoom(motionEvent);
             }
         } else if (action == MotionEvent.ACTION_DOWN) {
-            rtmpCamera1.tapToFocus(view, motionEvent);
+            rtmpCamera1.tapToFocus( motionEvent);
         }
         return true;
     }
