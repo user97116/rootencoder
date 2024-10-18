@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rootencoder_android/rootencoder_method_channel.dart';
 import 'package:rootencoder_android/text_view.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,14 +38,14 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String? v =  await MethodChannelRootencoder().getPlatformVersion();
-        print(v);
-    urlController.text  = v!;
-     MethodChannelRootencoder().connection().listen((c){
+    String? v = await MethodChannelRootencoder().getPlatformVersion();
+    print(v);
+    urlController.text = v!;
+    MethodChannelRootencoder().connection().listen((c) {
       print("sdsd $c");
-     });
-    MethodChannelRootencoder().connectionStream().listen((c){
-        print("sds2sd $c");
+    });
+    MethodChannelRootencoder().connectionStream().listen((c) {
+      print("sds2sd $c");
     });
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
@@ -57,10 +60,8 @@ class _MyAppState extends State<MyApp> {
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
     if (!mounted) return;
-   
-    setState(()  {
-    
-    });
+
+    setState(() {});
   }
 
   final TextEditingController urlController = TextEditingController();
@@ -71,7 +72,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title:  Text('Plugin example app'  ),
+          title: Text('Plugin example app'),
         ),
         body: Center(
           child: Column(
@@ -87,8 +88,9 @@ class _MyAppState extends State<MyApp> {
               ),
               TextButton(
                 onPressed: () {
-                  methodChannel.invokeMethod("switchCamera", "test stream").then((v){
-                    print("switchCamera: "+v);
+                  methodChannel.invokeMethod("changeResolution",
+                      {"width": 100, "height": 200}).then((v) {
+                    print("switchCamera: " + v);
                   });
                 },
                 child: const Text("Switch camera"),
@@ -106,8 +108,18 @@ class _MyAppState extends State<MyApp> {
                 child: const Text("Stop stream"),
               ),
               TextButton(
-                onPressed: () {
-                  methodChannel.invokeMethod("startRecord");
+                onPressed: () async {
+                  await [
+                    Permission.manageExternalStorage,
+                    Permission.storage,
+                  ].request();
+                  var path = Directory("storage/emulated/0/DevDham");
+                  if (!path.existsSync()) {
+                    path.createSync();
+                  }
+                  final file = path.path + "/abc.mp4";
+                  print(file);
+                  methodChannel.invokeMethod("startRecord", file);
                 },
                 child: const Text("Start record"),
               ),

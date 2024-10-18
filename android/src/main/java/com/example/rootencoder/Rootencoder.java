@@ -55,8 +55,6 @@ import io.flutter.plugin.platform.PlatformView;
 
 public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHolder.Callback, ConnectChecker, View.OnTouchListener {
     private final RtmpCamera1 rtmpCamera1;
-    private File folder;
-    private String currentDateAndTime = "123";
     private final MethodChannel methodChannel;
     private final EventChannel eventChannel;
     private final EventChannel eventChannel2;
@@ -64,6 +62,9 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private EventChannel.EventSink eventSink2;
     private OpenGlView openGlView;
     private Bitmap bitmap;
+    // Config
+    private int width = 1280;
+    private int height = 720;
 
     @Override
     public void onFlutterViewAttached(@NonNull View flutterView) {
@@ -72,11 +73,11 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         openGlView.setOnTouchListener(this);
 
     }
+
     Rootencoder(Context context, BinaryMessenger messenger, int id) {
         bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
-        folder = PathUtils.getRecordPath();
+
         openGlView = new OpenGlView(context);
-//        openGlView.setAspectRatioMode(AspectRatioMode.Fill);
         rtmpCamera1 = new RtmpCamera1(openGlView, this);
 
         methodChannel = new MethodChannel(messenger, "rootencoder");
@@ -117,15 +118,9 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
-
         switch (methodCall.method) {
-            case "screen":
-               try {
-                   rtmpCamera1.setPreviewOrientation((int)methodCall.arguments);
-                   result.success("Success");
-               }catch (Exception e){
-                   result.success(null);
-               }
+            case "changeResolution":
+                changeResolution(methodCall, result);
                 break;
             case "switchCamera":
                 switchCamera(methodCall, result);
@@ -262,7 +257,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 clearFilterFromStream(methodCall, result);
                 break;
             case "addImageToStream":
-                addImageToStream(methodCall,result);
+                addImageToStream(methodCall, result);
                 break;
             default:
                 result.notImplemented();
@@ -274,9 +269,17 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         try {
             rtmpCamera1.switchCamera();
         } catch (Exception e) {
-            Log.d("ERROR",e.getMessage());
+            Log.d("ERROR", e.getMessage());
         }
         result.success(null);
+    }
+
+    private void changeResolution(MethodCall methodCall, Result result) {
+        width = (int) methodCall.argument("width");
+        height = (int) methodCall.argument("height");
+        stopStream(methodCall, result);
+        stopRecord(methodCall, result);
+        result.success("changed with stop stream and record");
     }
 
     private void startStream(MethodCall methodCall, Result result) {
@@ -284,7 +287,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isStreaming()) {
             if (rtmpCamera1.isRecording()
                     || rtmpCamera1.prepareAudio() && rtmpCamera1.prepareVideo(
-                    1280, 720, 60, 1200 * 1024, 0
+                    width, height, 60, 1200 * 1024, 0
             )) {
                 rtmpCamera1.startStream(url);
             }
@@ -300,38 +303,25 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     }
 
     private void startRecord(MethodCall methodCall, Result result) {
+        String path = (String) methodCall.arguments;
         if (!rtmpCamera1.isRecording()) {
             try {
-                if (!folder.exists()) {
-                    folder.mkdir();
-                }
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
-                currentDateAndTime = sdf.format(new Date());
-                if (!rtmpCamera1.isStreaming()) {
-                    if (rtmpCamera1.prepareAudio() && rtmpCamera1.prepareVideo(
-                            1280, 720, 60, 1200 * 1024, 0
-                    )) {
-                        rtmpCamera1.startRecord(
-                                folder.getAbsolutePath() + "/" + currentDateAndTime + ".mp4");
-                        result.success(folder.getAbsolutePath() + "/" + currentDateAndTime + ".mp4");
-                    }
-                } else {
-                    rtmpCamera1.startRecord(
-                            folder.getAbsolutePath() + "/" + currentDateAndTime + ".mp4");
-                    result.success(folder.getAbsolutePath() + "/" + currentDateAndTime + ".mp4");
-
-                }
+                rtmpCamera1.prepareAudio();
+                rtmpCamera1.prepareVideo(width, height, 60, 1200 * 1024, 0);
+                rtmpCamera1.startRecord(path);
+                result.success(path);
             } catch (IOException e) {
                 rtmpCamera1.stopRecord();
+                result.success(e.getMessage());
             }
+        } else {
+            result.success(null);
         }
-        result.success(null);
     }
 
     private void stopRecord(MethodCall methodCall, Result result) {
         rtmpCamera1.stopRecord();
         result.success(null);
-
     }
 
     @Override
@@ -343,12 +333,12 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
         Log.d("STATUS", String.valueOf(surfaceHolder.getSurface().isValid()));
         if (surfaceHolder.getSurface().isValid()) {
-            Log.d("Valid","yes");
+            Log.d("Valid", "yes");
             try {
                 rtmpCamera1.startPreview();
                 rtmpCamera1.getStreamClient().setReTries(10);
             } catch (CameraOpenException e) {
-               Log.d("Camera can't attached","yes");
+                Log.d("Camera can't attached", "yes");
             }
         }
     }
@@ -360,7 +350,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             try {
                 rtmpCamera1.startPreview();
             } catch (Exception e) {
-               Log.d("surfaceChanged","can't preview");
+                Log.d("surfaceChanged", "can't preview");
             }
         }
     }
@@ -376,7 +366,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     void close() {
         if (rtmpCamera1.isRecording()) {
             rtmpCamera1.stopRecord();
-            currentDateAndTime = "";
         }
         if (rtmpCamera1.isStreaming()) {
             rtmpCamera1.stopStream();
@@ -565,7 +554,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         result.success(onPreview);
     }
 
-
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         int action = motionEvent.getAction();
@@ -580,7 +568,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     }
 
     void addTextToStream(MethodCall methodCall, Result result) {
-        String value =   (String) methodCall.arguments;
+        String value = (String) methodCall.arguments;
         TextObjectFilterRender textObjectFilterRender = new TextObjectFilterRender();
         rtmpCamera1.getGlInterface().addFilter(textObjectFilterRender);
         textObjectFilterRender.setText(value, 32, Color.RED);
