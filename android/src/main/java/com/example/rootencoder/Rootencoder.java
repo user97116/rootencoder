@@ -277,8 +277,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private void changeResolution(MethodCall methodCall, Result result) {
         width = (int) methodCall.argument("width");
         height = (int) methodCall.argument("height");
-        stopStream(methodCall, result);
-        stopRecord(methodCall, result);
         result.success("changed with stop stream and record");
     }
 
