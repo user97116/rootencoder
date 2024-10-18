@@ -1,5 +1,7 @@
 package com.example.rootencoder;
 
+import android.annotation.SuppressLint;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.WindowManager;
 import android.content.Context;
@@ -25,6 +27,7 @@ import static io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import static io.flutter.plugin.common.MethodChannel.Result;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.pedro.common.ConnectChecker;
 import com.pedro.common.VideoCodec;
@@ -32,6 +35,8 @@ import com.pedro.encoder.input.audio.MicrophoneMode;
 import com.pedro.encoder.input.gl.render.filters.object.ImageObjectFilterRender;
 import com.pedro.encoder.input.gl.render.filters.object.TextObjectFilterRender;
 import com.pedro.encoder.input.video.CameraOpenException;
+import com.pedro.encoder.input.video.facedetector.Face;
+import com.pedro.encoder.input.video.facedetector.FaceDetectorCallback;
 import com.pedro.encoder.utils.gl.AspectRatioMode;
 import com.pedro.encoder.utils.gl.TranslateTo;
 import com.pedro.library.rtmp.RtmpCamera1;
@@ -67,7 +72,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         openGlView.setOnTouchListener(this);
 
     }
-
     Rootencoder(Context context, BinaryMessenger messenger, int id) {
         bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
         folder = PathUtils.getRecordPath();
@@ -309,10 +313,13 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                     )) {
                         rtmpCamera1.startRecord(
                                 folder.getAbsolutePath() + "/" + currentDateAndTime + ".mp4");
+                        result.success(folder.getAbsolutePath() + "/" + currentDateAndTime + ".mp4");
                     }
                 } else {
                     rtmpCamera1.startRecord(
                             folder.getAbsolutePath() + "/" + currentDateAndTime + ".mp4");
+                    result.success(folder.getAbsolutePath() + "/" + currentDateAndTime + ".mp4");
+
                 }
             } catch (IOException e) {
                 rtmpCamera1.stopRecord();
