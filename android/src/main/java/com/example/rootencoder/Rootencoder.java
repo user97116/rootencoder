@@ -270,8 +270,8 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private void changeResolution(MethodCall methodCall, Result result) {
         width = (int) methodCall.argument("width");
         height = (int) methodCall.argument("height");
-        for (int i = 0;i <rtmpCamera1.getResolutionsBack().toArray().length; i++)
-            Log.d("amar",String.valueOf(rtmpCamera1.getResolutionsBack().get(i).getWidth())+"x"+String.valueOf(rtmpCamera1.getResolutionsBack().get(i).getHeight()));
+        for (int i = 0; i < rtmpCamera1.getResolutionsBack().toArray().length; i++)
+            Log.d("amar", String.valueOf(rtmpCamera1.getResolutionsBack().get(i).getWidth()) + "x" + String.valueOf(rtmpCamera1.getResolutionsBack().get(i).getHeight()));
 //        Log.d("amar",String.valueOf(rtmpCamera1.prepareVideo(width,height,1200 * 1024)));
         result.success("changed with stop stream and record");
     }
@@ -367,7 +367,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (rtmpCamera1.isStreaming()) {
             rtmpCamera1.stopStream();
         }
-        if(rtmpCamera1.isOnPreview())
+        if (rtmpCamera1.isOnPreview())
             rtmpCamera1.stopPreview();
     }
 
@@ -413,7 +413,8 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void onNewBitrate(long l) {
-        eventSink2.success(l);
+        if (eventSink2 != null)
+            eventSink2.success(l);
     }
 
     private void setVideoBitrateOnFly(MethodCall methodCall, Result result) {
@@ -548,7 +549,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 rtmpCamera1.setZoom(motionEvent);
             }
         } else if (action == MotionEvent.ACTION_DOWN) {
-            rtmpCamera1.tapToFocus( motionEvent);
+            rtmpCamera1.tapToFocus(motionEvent);
         }
         return true;
     }
