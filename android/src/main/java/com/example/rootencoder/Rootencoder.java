@@ -383,13 +383,9 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void onConnectionFailed(@NonNull String s) {
-        if (rtmpCamera1.getStreamClient().reTry(5000, s, null)) {
-        } else {
-            rtmpCamera1.stopStream();
-        }
+        rtmpCamera1.getStreamClient().reTry(5000, s, null);
         if (eventSink != null)
             eventSink.success("Reconnecting");
-
     }
 
     @Override
@@ -544,15 +540,23 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         int action = motionEvent.getAction();
+        Log.d("amar 2",String.valueOf(action ==MotionEvent.ACTION_MOVE ));
+
         if (motionEvent.getPointerCount() > 1) {
             if (action == MotionEvent.ACTION_MOVE) {
                 rtmpCamera1.setZoom(motionEvent);
+                view.performClick();
+                Log.d("amar",String.valueOf(action));
+
             }
         } else if (action == MotionEvent.ACTION_DOWN) {
             rtmpCamera1.tapToFocus(motionEvent);
+            view.performClick();
         }
         return true;
     }
+
+
 
     void addTextToStream(MethodCall methodCall, Result result) {
         String value = (String) methodCall.arguments;
