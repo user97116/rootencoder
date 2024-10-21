@@ -31,7 +31,6 @@ import androidx.annotation.Nullable;
 
 import com.pedro.common.ConnectChecker;
 import com.pedro.common.VideoCodec;
-import com.pedro.encoder.input.audio.MicrophoneMode;
 import com.pedro.encoder.input.gl.render.filters.object.ImageObjectFilterRender;
 import com.pedro.encoder.input.gl.render.filters.object.TextObjectFilterRender;
 import com.pedro.encoder.input.video.CameraOpenException;
@@ -82,7 +81,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         openGlView = new OpenGlView(context);
         openGlView.setAspectRatioMode(AspectRatioMode.Fill);
         rtmpCamera1 = new RtmpCamera2(openGlView, this);
-        rtmpCamera1.setForce(CodecUtil.Force.SOFTWARE, CodecUtil.Force.FIRST_COMPATIBLE_FOUND);
         methodChannel = new MethodChannel(messenger, "rootencoder");
         methodChannel.setMethodCallHandler(this);
 
@@ -155,14 +153,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
             case "setZoom":
                 setZoom(methodCall, result);
-                break;
-
-            case "setLimitFPSOnFly":
-                setLimitFPSOnFly(methodCall, result);
-                break;
-
-            case "setMicrophoneMode":
-                setMicrophoneMode(methodCall, result);
                 break;
 
             case "setExposure":
@@ -435,18 +425,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private void setZoom(MethodCall methodCall, Result result) {
         int level = (int) methodCall.arguments;
         rtmpCamera1.setZoom(level);
-        result.success(null);
-    }
-
-    private void setLimitFPSOnFly(MethodCall methodCall, Result result) {
-        int fps = (int) methodCall.arguments;
-        rtmpCamera1.setLimitFPSOnFly(fps);
-        result.success(null);
-    }
-
-    private void setMicrophoneMode(MethodCall methodCall, Result result) {
-        int mode = (int) methodCall.arguments;
-        rtmpCamera1.setMicrophoneMode(MicrophoneMode.getEntries().get(mode));
         result.success(null);
     }
 
