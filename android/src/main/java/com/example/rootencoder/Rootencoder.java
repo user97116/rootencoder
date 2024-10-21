@@ -330,7 +330,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             Log.d("Valid", "yes");
             try {
                 rtmpCamera1.startPreview();
-                rtmpCamera1.getStreamClient().setReTries(10);
+                rtmpCamera1.getStreamClient().setReTries(5000000);
             } catch (CameraOpenException e) {
                 Log.d("Camera can't attached", "yes");
             }
@@ -383,7 +383,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void onConnectionFailed(@NonNull String s) {
-        rtmpCamera1.getStreamClient().reTry(5000, s, null);
+        rtmpCamera1.getStreamClient().reTry(5000000, s, null);
         if (eventSink != null)
             eventSink.success("Reconnecting");
     }
