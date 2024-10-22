@@ -396,7 +396,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void onConnectionFailed(@NonNull String s) {
-        rtmpCamera1.getStreamClient().reTry(1000, s, null);
+        rtmpCamera1.getStreamClient().reTry(5000, s, null);
         if (eventSink != null)
             eventSink.success("Reconnecting");
     }
