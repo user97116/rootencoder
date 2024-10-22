@@ -83,7 +83,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         rtmpCamera1 = new RtmpCamera2(openGlView, this);
         methodChannel = new MethodChannel(messenger, "rootencoder");
         methodChannel.setMethodCallHandler(this);
-
+        
         eventChannel = new EventChannel(messenger, "connectionStream");
         eventChannel.setStreamHandler(new EventChannel.StreamHandler() {
             @Override
@@ -301,7 +301,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isRecording()) {
             try {
                 rtmpCamera1.prepareAudio();
-                rtmpCamera1.prepareVideo(width, height, 60, 1200 * 1024, 0);
+                rtmpCamera1.prepareVideo(width, height, 1200 * 1024);
                 rtmpCamera1.startRecord(path);
                 result.success(path);
             } catch (IOException e) {
@@ -383,7 +383,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void onConnectionFailed(@NonNull String s) {
-        rtmpCamera1.getStreamClient().reTry(5000000, s, null);
+        rtmpCamera1.getStreamClient().reTry(1000, s, null);
         if (eventSink != null)
             eventSink.success("Reconnecting");
     }
