@@ -77,13 +77,17 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     Rootencoder(Context context, BinaryMessenger messenger, int id) {
         bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
-
         openGlView = new OpenGlView(context);
         openGlView.setAspectRatioMode(AspectRatioMode.Fill);
         rtmpCamera1 = new RtmpCamera2(openGlView, this);
         methodChannel = new MethodChannel(messenger, "rootencoder");
         methodChannel.setMethodCallHandler(this);
-        
+
+        rtmpCamera1.setVideoCodec(VideoCodec.AV1);
+        if (rtmpCamera1.isVideoStabilizationEnabled()) {
+            rtmpCamera1.enableVideoStabilization();
+        }
+
         eventChannel = new EventChannel(messenger, "connectionStream");
         eventChannel.setStreamHandler(new EventChannel.StreamHandler() {
             @Override
@@ -272,7 +276,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         height = (int) methodCall.argument("height");
         for (int i = 0; i < rtmpCamera1.getResolutionsBack().toArray().length; i++)
             Log.d("amar", String.valueOf(rtmpCamera1.getResolutionsBack().get(i).getWidth()) + "x" + String.valueOf(rtmpCamera1.getResolutionsBack().get(i).getHeight()));
-//        Log.d("amar",String.valueOf(rtmpCamera1.prepareVideo(width,height,1200 * 1024)));
         result.success("changed with stop stream and record");
     }
 
@@ -281,7 +284,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isStreaming()) {
             if (rtmpCamera1.isRecording()
                     || rtmpCamera1.prepareAudio() && rtmpCamera1.prepareVideo(
-                    width, height, 60, 1200 * 1024, 0
+                    width, height, getAdjustedBitrate()
             )) {
                 rtmpCamera1.startStream(url);
             }
@@ -296,12 +299,16 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         result.success(null);
     }
 
+    int getAdjustedBitrate() {
+        return height <= 480? 1200 * 1024:height<= 540?3000*1024: height<=720? 1500*1024:3000 * 1024;
+    }
+
     private void startRecord(MethodCall methodCall, Result result) {
         String path = (String) methodCall.arguments;
         if (!rtmpCamera1.isRecording()) {
             try {
                 rtmpCamera1.prepareAudio();
-                rtmpCamera1.prepareVideo(width, height, 1200 * 1024);
+                rtmpCamera1.prepareVideo(width, height, getAdjustedBitrate());
                 rtmpCamera1.startRecord(path);
                 result.success(path);
             } catch (IOException e) {
@@ -329,8 +336,12 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (surfaceHolder.getSurface().isValid() && !rtmpCamera1.isOnPreview()) {
             Log.d("Valid", "yes");
             try {
-                rtmpCamera1.startPreview();
-                rtmpCamera1.getStreamClient().setReTries(5000000);
+                if (!rtmpCamera1.isOnPreview()) {
+                    rtmpCamera1.startPreview();
+                }
+                if (!rtmpCamera1.isStreaming()) {
+                    rtmpCamera1.getStreamClient().setReTries(5000000);
+                }
             } catch (CameraOpenException e) {
                 Log.d("Camera can't attached", "yes");
             }
@@ -540,13 +551,13 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         int action = motionEvent.getAction();
-        Log.d("amar 2",String.valueOf(action ==MotionEvent.ACTION_MOVE ));
+        Log.d("amar 2", String.valueOf(action == MotionEvent.ACTION_MOVE));
 
         if (motionEvent.getPointerCount() > 1) {
             if (action == MotionEvent.ACTION_MOVE) {
                 rtmpCamera1.setZoom(motionEvent);
                 view.performClick();
-                Log.d("amar",String.valueOf(action));
+                Log.d("amar", String.valueOf(action));
 
             }
         } else if (action == MotionEvent.ACTION_DOWN) {
@@ -555,7 +566,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         }
         return true;
     }
-
 
 
     void addTextToStream(MethodCall methodCall, Result result) {
