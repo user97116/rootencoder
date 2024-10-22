@@ -31,6 +31,7 @@ import androidx.annotation.Nullable;
 
 import com.pedro.common.ConnectChecker;
 import com.pedro.common.VideoCodec;
+import com.pedro.encoder.TimestampMode;
 import com.pedro.encoder.input.gl.render.filters.object.ImageObjectFilterRender;
 import com.pedro.encoder.input.gl.render.filters.object.TextObjectFilterRender;
 import com.pedro.encoder.input.video.CameraOpenException;
@@ -83,6 +84,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         methodChannel = new MethodChannel(messenger, "rootencoder");
         methodChannel.setMethodCallHandler(this);
 
+        rtmpCamera1.setTimestampMode(TimestampMode.BUFFER, TimestampMode.BUFFER)
         rtmpCamera1.setVideoCodec(VideoCodec.AV1);
         if (rtmpCamera1.isVideoStabilizationEnabled()) {
             rtmpCamera1.enableVideoStabilization();
