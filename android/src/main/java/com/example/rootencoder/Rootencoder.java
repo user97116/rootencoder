@@ -68,6 +68,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     // Config
     private int width = 1280;
     private int height = 720;
+    private int exposure = 0;
 
     @Override
     public void onFlutterViewAttached(@NonNull View flutterView) {
@@ -289,6 +290,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                     || rtmpCamera1.prepareAudio() && rtmpCamera1.prepareVideo(
                     width, height, getAdjustedBitrate()
             )) {
+                rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startStream(url);
             }
         } else {
@@ -312,6 +314,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             try {
                 rtmpCamera1.prepareAudio();
                 rtmpCamera1.prepareVideo(width, height, getAdjustedBitrate());
+                rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startRecord(path);
                 result.success(path);
             } catch (IOException e) {
@@ -453,6 +456,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private void setExposure(MethodCall methodCall, Result result) {
         int value = (int) methodCall.arguments;
         rtmpCamera1.setExposure(value);
+        exposure = value;
         result.success(null);
     }
 
