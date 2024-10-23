@@ -47,6 +47,7 @@ import com.pedro.library.view.OpenGlView;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -83,9 +84,8 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         rtmpCamera1 = new RtmpCamera2(openGlView, this);
         methodChannel = new MethodChannel(messenger, "rootencoder");
         methodChannel.setMethodCallHandler(this);
-
         rtmpCamera1.setTimestampMode(TimestampMode.BUFFER, TimestampMode.BUFFER);
-        rtmpCamera1.setVideoCodec(VideoCodec.AV1);
+//        rtmpCamera1.setVideoCodec(VideoCodec.AV1);
         if (rtmpCamera1.isVideoStabilizationEnabled()) {
             rtmpCamera1.enableVideoStabilization();
         }
@@ -122,6 +122,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     public View getView() {
         return openGlView;
     }
+
 
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
@@ -302,7 +303,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     }
 
     int getAdjustedBitrate() {
-        return height <= 480? 1200 * 1024:height<= 540?3000*1024: height<=720? 1500*1024:3000 * 1024;
+        return height <= 480 ? 1200 * 1024 : height <= 540 ? 3000 * 1024 : height <= 720 ? 1500 * 1024 : 3000 * 1024;
     }
 
     private void startRecord(MethodCall methodCall, Result result) {
@@ -395,6 +396,17 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     }
 
     @Override
+    public void onFlutterViewDetached() {
+        PlatformView.super.onFlutterViewDetached();
+        rtmpCamera1.stopStream();
+        rtmpCamera1.stopRecord();
+        rtmpCamera1.stopPreview();
+        rtmpCamera1.stopCamera();
+        eventSink.endOfStream();
+        eventSink2.endOfStream();
+    }
+
+    @Override
     public void onConnectionFailed(@NonNull String s) {
         rtmpCamera1.getStreamClient().reTry(5000, s, null);
         if (eventSink != null)
@@ -433,7 +445,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     }
 
     private void setZoom(MethodCall methodCall, Result result) {
-        int level = (int) methodCall.arguments;
+        float level = (float) methodCall.arguments;
         rtmpCamera1.setZoom(level);
         result.success(null);
     }
