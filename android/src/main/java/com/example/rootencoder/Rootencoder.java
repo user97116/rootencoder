@@ -288,7 +288,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isStreaming()) {
             if (rtmpCamera1.isRecording()
                     || rtmpCamera1.prepareAudio() && rtmpCamera1.prepareVideo(
-                    width, height, getAdjustedBitrate()
+                    width, height, 60, getAdjustedBitrate(), 0
             )) {
                 rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startStream(url);
@@ -313,7 +313,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isRecording()) {
             try {
                 rtmpCamera1.prepareAudio();
-                rtmpCamera1.prepareVideo(width, height, getAdjustedBitrate());
+                rtmpCamera1.prepareVideo(width, height,60, getAdjustedBitrate(),0);
                 rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startRecord(path);
                 result.success(path);
