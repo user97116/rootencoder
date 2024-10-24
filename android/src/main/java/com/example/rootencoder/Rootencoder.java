@@ -120,9 +120,10 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     }
 
     private void setVideoCodecInit() {
+       return;
         try {
             rtmpCamera1.setVideoCodec(VideoCodec.AV1);
-        }catch (Exception e){
+        } catch (Exception e) {
             rtmpCamera1.setVideoCodec(VideoCodec.H264);
         }
     }
@@ -295,14 +296,11 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private void startStream(MethodCall methodCall, Result result) {
         String url = (String) methodCall.arguments;
         if (!rtmpCamera1.isStreaming()) {
-            if (rtmpCamera1.isRecording()
-                    || rtmpCamera1.prepareAudio() && rtmpCamera1.prepareVideo(
-                    width, height, 60, getAdjustedBitrate(), 0
-            )) {
-                setVideoCodecInit();
-                rtmpCamera1.setExposure(exposure);
-                rtmpCamera1.startStream(url);
-            }
+            rtmpCamera1.prepareAudio();
+            rtmpCamera1.prepareVideo(width, height, 60, getAdjustedBitrate(), 0);
+            setVideoCodecInit();
+            rtmpCamera1.setExposure(exposure);
+            rtmpCamera1.startStream(url);
         } else {
             rtmpCamera1.stopStream();
         }
@@ -323,7 +321,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isRecording()) {
             try {
                 rtmpCamera1.prepareAudio();
-                rtmpCamera1.prepareVideo(width, height,60, getAdjustedBitrate(),0);
+                rtmpCamera1.prepareVideo(width, height, 60, getAdjustedBitrate(), 0);
                 setVideoCodecInit();
                 rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startRecord(path);
@@ -461,7 +459,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     private void setZoom(MethodCall methodCall, Result result) {
         double level = (double) methodCall.arguments;
-        rtmpCamera1.setZoom((float)level);
+        rtmpCamera1.setZoom((float) level);
         result.success(null);
     }
 
