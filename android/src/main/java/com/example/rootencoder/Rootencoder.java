@@ -34,6 +34,7 @@ import com.pedro.common.VideoCodec;
 import com.pedro.encoder.TimestampMode;
 import com.pedro.encoder.input.gl.render.filters.object.ImageObjectFilterRender;
 import com.pedro.encoder.input.gl.render.filters.object.TextObjectFilterRender;
+import com.pedro.encoder.input.video.CameraHelper;
 import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.encoder.input.video.facedetector.Face;
 import com.pedro.encoder.input.video.facedetector.FaceDetectorCallback;
@@ -336,6 +337,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         close();
     }
 
+
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
         Log.d("STATUS", String.valueOf(surfaceHolder.getSurface().isValid()));
@@ -343,7 +345,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             Log.d("Valid", "yes");
             try {
                 if (!rtmpCamera1.isOnPreview()) {
-                    rtmpCamera1.startPreview();
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, 0);
                 }
                 if (!rtmpCamera1.isStreaming()) {
                     rtmpCamera1.getStreamClient().setReTries(5000000);
@@ -361,7 +363,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 rtmpCamera1.stopPreview();
             try {
                 if (!rtmpCamera1.isOnPreview())
-                    rtmpCamera1.startPreview();
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK,0);
             } catch (Exception e) {
                 Log.d("surfaceChanged", "can't preview");
             }
