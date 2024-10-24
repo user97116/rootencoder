@@ -575,7 +575,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
         if (motionEvent.getPointerCount() > 1) {
             if (action == MotionEvent.ACTION_MOVE) {
-                rtmpCamera1.setZoom(motionEvent);
+                rtmpCamera1.setZoom(motionEvent, 0.05f);
                 view.performClick();
                 Log.d("amar", String.valueOf(action));
 
