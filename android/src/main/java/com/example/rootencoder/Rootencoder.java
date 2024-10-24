@@ -87,7 +87,12 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         methodChannel = new MethodChannel(messenger, "rootencoder");
         methodChannel.setMethodCallHandler(this);
         rtmpCamera1.setTimestampMode(TimestampMode.BUFFER, TimestampMode.BUFFER);
-//        rtmpCamera1.setVideoCodec(VideoCodec.AV1);
+
+        try {
+            rtmpCamera1.setVideoCodec(VideoCodec.AV1);
+        }catch (Exception e){
+            rtmpCamera1.setVideoCodec(VideoCodec.H264);
+        }
         if (rtmpCamera1.isVideoStabilizationEnabled()) {
             rtmpCamera1.enableVideoStabilization();
         }
