@@ -82,7 +82,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     Rootencoder(Context context, BinaryMessenger messenger, int id) {
         bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
         openGlView = new OpenGlView(context);
-        openGlView.setAspectRatioMode(AspectRatioMode.Fill);
+//        openGlView.setAspectRatioMode(AspectRatioMode.Fill);
         rtmpCamera1 = new RtmpCamera2(openGlView, this);
         methodChannel = new MethodChannel(messenger, "rootencoder");
         methodChannel.setMethodCallHandler(this);
@@ -345,7 +345,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             Log.d("Valid", "yes");
             try {
                 if (!rtmpCamera1.isOnPreview()) {
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, 0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 0);
                 }
                 if (!rtmpCamera1.isStreaming()) {
                     rtmpCamera1.getStreamClient().setReTries(5000000);
@@ -363,7 +363,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 rtmpCamera1.stopPreview();
             try {
                 if (!rtmpCamera1.isOnPreview())
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK,0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 0);
             } catch (Exception e) {
                 Log.d("surfaceChanged", "can't preview");
             }
