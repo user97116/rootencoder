@@ -450,8 +450,8 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     }
 
     private void setZoom(MethodCall methodCall, Result result) {
-        float level = (float) methodCall.arguments;
-        rtmpCamera1.setZoom(level);
+        double level = (double) methodCall.arguments;
+        rtmpCamera1.setZoom((float)level);
         result.success(null);
     }
 
