@@ -120,7 +120,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     }
 
     private void setVideoCodecInit() {
-       return;
         try {
             rtmpCamera1.setVideoCodec(VideoCodec.AV1);
         } catch (Exception e) {
@@ -298,7 +297,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isStreaming()) {
             rtmpCamera1.prepareAudio();
             rtmpCamera1.prepareVideo(width, height, 60, getAdjustedBitrate(), 0);
-            setVideoCodecInit();
             rtmpCamera1.setExposure(exposure);
             rtmpCamera1.startStream(url);
         } else {
@@ -322,7 +320,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             try {
                 rtmpCamera1.prepareAudio();
                 rtmpCamera1.prepareVideo(width, height, 60, getAdjustedBitrate(), 0);
-                setVideoCodecInit();
                 rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startRecord(path);
                 result.success(path);
