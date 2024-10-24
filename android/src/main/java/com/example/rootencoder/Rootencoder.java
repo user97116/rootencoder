@@ -88,11 +88,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         methodChannel.setMethodCallHandler(this);
         rtmpCamera1.setTimestampMode(TimestampMode.BUFFER, TimestampMode.BUFFER);
 
-        try {
-            rtmpCamera1.setVideoCodec(VideoCodec.AV1);
-        }catch (Exception e){
-            rtmpCamera1.setVideoCodec(VideoCodec.H264);
-        }
         if (rtmpCamera1.isVideoStabilizationEnabled()) {
             rtmpCamera1.enableVideoStabilization();
         }
@@ -122,6 +117,14 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 eventSink2 = null;
             }
         });
+    }
+
+    private void setVideoCodecInit() {
+        try {
+            rtmpCamera1.setVideoCodec(VideoCodec.AV1);
+        }catch (Exception e){
+            rtmpCamera1.setVideoCodec(VideoCodec.H264);
+        }
     }
 
 
@@ -296,6 +299,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                     || rtmpCamera1.prepareAudio() && rtmpCamera1.prepareVideo(
                     width, height, 60, getAdjustedBitrate(), 0
             )) {
+                setVideoCodecInit();
                 rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startStream(url);
             }
@@ -320,6 +324,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             try {
                 rtmpCamera1.prepareAudio();
                 rtmpCamera1.prepareVideo(width, height,60, getAdjustedBitrate(),0);
+                setVideoCodecInit();
                 rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startRecord(path);
                 result.success(path);
