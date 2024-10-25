@@ -1,23 +1,13 @@
 package com.example.rootencoder;
 
-import android.annotation.SuppressLint;
-import android.graphics.Rect;
 import android.util.Log;
-import android.view.WindowManager;
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.Build;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
@@ -27,7 +17,6 @@ import static io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import static io.flutter.plugin.common.MethodChannel.Result;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.pedro.common.ConnectChecker;
 import com.pedro.common.VideoCodec;
@@ -36,23 +25,12 @@ import com.pedro.encoder.input.gl.render.filters.object.ImageObjectFilterRender;
 import com.pedro.encoder.input.gl.render.filters.object.TextObjectFilterRender;
 import com.pedro.encoder.input.video.CameraHelper;
 import com.pedro.encoder.input.video.CameraOpenException;
-import com.pedro.encoder.input.video.facedetector.Face;
-import com.pedro.encoder.input.video.facedetector.FaceDetectorCallback;
-import com.pedro.encoder.utils.CodecUtil;
-import com.pedro.encoder.utils.gl.AspectRatioMode;
 import com.pedro.encoder.utils.gl.TranslateTo;
-import com.pedro.library.rtmp.RtmpCamera1;
 import com.pedro.library.rtmp.RtmpCamera2;
 import com.pedro.library.view.OpenGlView;
 
-import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.logging.Logger;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.platform.PlatformView;
@@ -79,7 +57,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         PlatformView.super.onFlutterViewAttached(flutterView);
         openGlView.getHolder().addCallback(this);
         openGlView.setOnTouchListener(this);
-
     }
 
     Rootencoder(Context context, BinaryMessenger messenger, int id) {
@@ -141,7 +118,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
         switch (methodCall.method) {
             case "startPreview":
-                rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 60,0);
+                rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 60, 0);
                 break;
             case "changeResolution":
                 changeResolution(methodCall, result);
@@ -303,12 +280,12 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isStreaming()) {
             try {
                 rtmpCamera1.prepareAudio();
-                rtmpCamera1.prepareVideo(width, height, fps, getAdjustedBitrate(),0);
+                rtmpCamera1.prepareVideo(width, height, fps, getAdjustedBitrate(), 0);
                 rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startStream(url);
                 result.success("connected");
             } catch (Exception e) {
-                Log.d("amar",e.getMessage());
+                Log.d("amar", e.getMessage());
                 result.success(e.getMessage());
             }
         } else {
@@ -362,7 +339,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             Log.d("Valid", "yes");
             try {
                 if (!rtmpCamera1.isOnPreview()) {
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, fps,0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, fps, 0);
                 }
                 if (!rtmpCamera1.isStreaming()) {
                     rtmpCamera1.getStreamClient().setReTries(5000000);
@@ -376,11 +353,10 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         if (rtmpCamera1 != null) {
-            if (rtmpCamera1.isOnPreview())
-                rtmpCamera1.stopPreview();
+            if (rtmpCamera1.isOnPreview()) rtmpCamera1.stopPreview();
             try {
                 if (!rtmpCamera1.isOnPreview())
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height,fps, 0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, fps, 0);
             } catch (Exception e) {
                 Log.d("surfaceChanged", "can't preview");
             }
@@ -389,8 +365,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
-        if (rtmpCamera1 != null && rtmpCamera1.isOnPreview()
-        ) {
+        if (rtmpCamera1 != null && rtmpCamera1.isOnPreview()) {
             rtmpCamera1.stopPreview();
         }
     }
@@ -403,8 +378,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (rtmpCamera1.isStreaming()) {
             rtmpCamera1.stopStream();
         }
-        if (rtmpCamera1.isOnPreview())
-            rtmpCamera1.stopPreview();
+        if (rtmpCamera1.isOnPreview()) rtmpCamera1.stopPreview();
     }
 
     @Override
@@ -431,33 +405,28 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void onConnectionFailed(@NonNull String s) {
         rtmpCamera1.getStreamClient().reTry(5000, s, null);
-        if (eventSink != null)
-            eventSink.success("Reconnecting");
+        if (eventSink != null) eventSink.success("Reconnecting");
     }
 
     @Override
     public void onConnectionStarted(@NonNull String s) {
-        if (eventSink != null)
-            eventSink.success("Connecting");
+        if (eventSink != null) eventSink.success("Connecting");
     }
 
     @Override
     public void onConnectionSuccess() {
-        if (eventSink != null)
-            eventSink.success("Connected");
+        if (eventSink != null) eventSink.success("Connected");
 
     }
 
     @Override
     public void onDisconnect() {
-        if (eventSink != null)
-            eventSink.success("Disconnected");
+        if (eventSink != null) eventSink.success("Disconnected");
     }
 
     @Override
     public void onNewBitrate(long l) {
-        if (eventSink2 != null)
-            eventSink2.success(l);
+        if (eventSink2 != null) eventSink2.success(l);
     }
 
     private void setVideoBitrateOnFly(MethodCall methodCall, Result result) {
@@ -610,8 +579,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         TextObjectFilterRender textObjectFilterRender = new TextObjectFilterRender();
         rtmpCamera1.getGlInterface().addFilter(textObjectFilterRender);
         textObjectFilterRender.setText(value, 32, Color.RED);
-        textObjectFilterRender.setDefaultScale(rtmpCamera1.getStreamWidth(),
-                rtmpCamera1.getStreamHeight());
+        textObjectFilterRender.setDefaultScale(rtmpCamera1.getStreamWidth(), rtmpCamera1.getStreamHeight());
         textObjectFilterRender.setPosition(TranslateTo.BOTTOM);
     }
 
