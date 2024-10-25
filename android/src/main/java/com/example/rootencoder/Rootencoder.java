@@ -48,8 +48,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private int width = 1280;
     private int height = 720;
     private int exposure = 0;
-    private int rWidth = 1280;
-    private int rHeight = 720;
     private int fps = 30;
 
     @Override
@@ -117,9 +115,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
         switch (methodCall.method) {
-            case "startPreview":
-                rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 60, 0);
-                break;
             case "changeResolution":
                 changeResolution(methodCall, result);
                 break;
@@ -279,9 +274,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         String url = (String) methodCall.arguments;
         if (!rtmpCamera1.isStreaming()) {
             try {
-                rtmpCamera1.prepareAudio();
-                rtmpCamera1.prepareVideo(width, height, fps, getAdjustedBitrate(), 0);
-                rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startStream(url);
                 result.success("connected");
             } catch (Exception e) {
@@ -308,7 +300,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isRecording()) {
             try {
                 rtmpCamera1.prepareAudio();
-                rtmpCamera1.prepareVideo(rWidth, rHeight, fps, 6500 * 1024, 0);
+                rtmpCamera1.prepareVideo(width, height, fps, getAdjustedBitrate(), 0);
                 rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startRecord(path);
                 result.success(path);
