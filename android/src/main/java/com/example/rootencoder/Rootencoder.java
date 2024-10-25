@@ -137,6 +137,9 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
         switch (methodCall.method) {
+            case "startPreview":
+                rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 0);
+                break;
             case "changeResolution":
                 changeResolution(methodCall, result);
                 break;
