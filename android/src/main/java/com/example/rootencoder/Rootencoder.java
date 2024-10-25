@@ -70,6 +70,8 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private int width = 1280;
     private int height = 720;
     private int exposure = 0;
+    private int rWidth = 1280;
+    private int rHeight = 720;
 
     @Override
     public void onFlutterViewAttached(@NonNull View flutterView) {
@@ -322,7 +324,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isRecording()) {
             try {
                 rtmpCamera1.prepareAudio();
-                rtmpCamera1.prepareVideo(width, height, 60, getAdjustedBitrate(), 0);
+                rtmpCamera1.prepareVideo(rWidth, rHeight, 60, 6500 * 1024, 0);
                 rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startRecord(path);
                 result.success(path);
