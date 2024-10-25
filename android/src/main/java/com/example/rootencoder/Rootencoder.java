@@ -72,6 +72,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private int exposure = 0;
     private int rWidth = 1280;
     private int rHeight = 720;
+    private int fps = 30;
 
     @Override
     public void onFlutterViewAttached(@NonNull View flutterView) {
@@ -302,17 +303,18 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isStreaming()) {
             try {
                 rtmpCamera1.prepareAudio();
-                rtmpCamera1.prepareVideo(width, height, 60, getAdjustedBitrate(), 0);
+                rtmpCamera1.prepareVideo(width, height, fps, getAdjustedBitrate(),0);
                 rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startStream(url);
+                result.success("connected");
             } catch (Exception e) {
                 Log.d("amar",e.getMessage());
                 result.success(e.getMessage());
             }
         } else {
             rtmpCamera1.stopStream();
+            result.success(null);
         }
-        result.success(null);
     }
 
     private void stopStream(MethodCall methodCall, Result result) {
@@ -329,7 +331,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         if (!rtmpCamera1.isRecording()) {
             try {
                 rtmpCamera1.prepareAudio();
-                rtmpCamera1.prepareVideo(rWidth, rHeight, 60, 6500 * 1024, 0);
+                rtmpCamera1.prepareVideo(rWidth, rHeight, fps, 6500 * 1024, 0);
                 rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startRecord(path);
                 result.success(path);
@@ -360,7 +362,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             Log.d("Valid", "yes");
             try {
                 if (!rtmpCamera1.isOnPreview()) {
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 60,0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, fps,0);
                 }
                 if (!rtmpCamera1.isStreaming()) {
                     rtmpCamera1.getStreamClient().setReTries(5000000);
@@ -378,7 +380,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 rtmpCamera1.stopPreview();
             try {
                 if (!rtmpCamera1.isOnPreview())
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height,60, 0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height,fps, 0);
             } catch (Exception e) {
                 Log.d("surfaceChanged", "can't preview");
             }
