@@ -138,7 +138,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
         switch (methodCall.method) {
             case "startPreview":
-                rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 0);
+                rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 60,0);
                 break;
             case "changeResolution":
                 changeResolution(methodCall, result);
@@ -314,7 +314,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     }
 
     int getAdjustedBitrate() {
-        return height <= 480 ? 1200 * 1024 : height <= 540 ? 3000 * 1024 : height <= 720 ? 1500 * 1024 : 3000 * 1024;
+        return height <= 480 ? 1250 * 1024 : height <= 540 ? 2500 * 1024 : height <= 720 ? 6500 * 1024 : 10000 * 1024;
     }
 
     private void startRecord(MethodCall methodCall, Result result) {
@@ -353,7 +353,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             Log.d("Valid", "yes");
             try {
                 if (!rtmpCamera1.isOnPreview()) {
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 60,0);
                 }
                 if (!rtmpCamera1.isStreaming()) {
                     rtmpCamera1.getStreamClient().setReTries(5000000);
@@ -371,7 +371,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 rtmpCamera1.stopPreview();
             try {
                 if (!rtmpCamera1.isOnPreview())
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height,60, 0);
             } catch (Exception e) {
                 Log.d("surfaceChanged", "can't preview");
             }
