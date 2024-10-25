@@ -1,13 +1,28 @@
 package com.example.rootencoder;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.annotation.SuppressLint;
+import android.graphics.Rect;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
 import android.util.Log;
+import android.view.WindowManager;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.os.Build;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
@@ -17,6 +32,7 @@ import static io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import static io.flutter.plugin.common.MethodChannel.Result;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.pedro.common.ConnectChecker;
 import com.pedro.common.VideoCodec;
@@ -25,12 +41,23 @@ import com.pedro.encoder.input.gl.render.filters.object.ImageObjectFilterRender;
 import com.pedro.encoder.input.gl.render.filters.object.TextObjectFilterRender;
 import com.pedro.encoder.input.video.CameraHelper;
 import com.pedro.encoder.input.video.CameraOpenException;
+import com.pedro.encoder.input.video.facedetector.Face;
+import com.pedro.encoder.input.video.facedetector.FaceDetectorCallback;
+import com.pedro.encoder.utils.CodecUtil;
+import com.pedro.encoder.utils.gl.AspectRatioMode;
 import com.pedro.encoder.utils.gl.TranslateTo;
+import com.pedro.library.rtmp.RtmpCamera1;
 import com.pedro.library.rtmp.RtmpCamera2;
 import com.pedro.library.view.OpenGlView;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Logger;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.platform.PlatformView;
@@ -48,13 +75,15 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private int width = 1280;
     private int height = 720;
     private int exposure = 0;
-    private int fps = 30;
+    private int fps = 60;
+    private String rtmpURL = null;
 
     @Override
     public void onFlutterViewAttached(@NonNull View flutterView) {
         PlatformView.super.onFlutterViewAttached(flutterView);
         openGlView.getHolder().addCallback(this);
         openGlView.setOnTouchListener(this);
+
     }
 
     Rootencoder(Context context, BinaryMessenger messenger, int id) {
@@ -95,6 +124,25 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 eventSink2 = null;
             }
         });
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(Network network) {
+                Log.d("amar 2", network.toString());
+                if (rtmpCamera1.isRecording() && !rtmpCamera1.isStreaming()) {
+                    rtmpCamera1.startStream(rtmpURL);
+                }
+            }
+
+            @Override
+            public void onLost(Network network) {
+                Log.d("amar lost", network.toString());
+                rtmpCamera1.stopStream();
+            }
+        });
+        rtmpCamera1.getStreamClient().setReTries(5000000);
     }
 
     private void setVideoCodecInit() {
@@ -115,6 +163,9 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
         switch (methodCall.method) {
+            case "startPreview":
+                rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 60, 0);
+                break;
             case "changeResolution":
                 changeResolution(methodCall, result);
                 break;
@@ -272,8 +323,12 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     private void startStream(MethodCall methodCall, Result result) {
         String url = (String) methodCall.arguments;
+        rtmpURL = url;
         if (!rtmpCamera1.isStreaming()) {
             try {
+                rtmpCamera1.prepareAudio();
+                rtmpCamera1.prepareVideo(width, height, fps, getAdjustedBitrate(), 0);
+                rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startStream(url);
                 result.success("connected");
             } catch (Exception e) {
@@ -333,9 +388,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 if (!rtmpCamera1.isOnPreview()) {
                     rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, fps, 0);
                 }
-                if (!rtmpCamera1.isStreaming()) {
-                    rtmpCamera1.getStreamClient().setReTries(5000000);
-                }
             } catch (CameraOpenException e) {
                 Log.d("Camera can't attached", "yes");
             }
@@ -364,6 +416,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
 
     void close() {
+        Log.d("amar", "hello closing...");
         if (rtmpCamera1.isRecording()) {
             rtmpCamera1.stopRecord();
         }
@@ -396,23 +449,30 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void onConnectionFailed(@NonNull String s) {
+        Log.d("amar", "onConnectionFailed " + s);
         rtmpCamera1.getStreamClient().reTry(5000, s, null);
         if (eventSink != null) eventSink.success("Reconnecting");
     }
 
     @Override
     public void onConnectionStarted(@NonNull String s) {
+        Log.d("amar", "onConnectionStarted " + s);
+
         if (eventSink != null) eventSink.success("Connecting");
     }
 
     @Override
     public void onConnectionSuccess() {
+        Log.d("amar", "onConnectionSuccess");
+        io.flutter.Log.d("amar", "hello onConnectionSuccess...");
+
         if (eventSink != null) eventSink.success("Connected");
 
     }
 
     @Override
     public void onDisconnect() {
+        Log.d("amar", "onDisconnect");
         if (eventSink != null) eventSink.success("Disconnected");
     }
 
