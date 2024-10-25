@@ -326,9 +326,9 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         rtmpURL = url;
         if (!rtmpCamera1.isStreaming()) {
             try {
-                rtmpCamera1.prepareAudio();
-                rtmpCamera1.prepareVideo(width, height, fps, getAdjustedBitrate(), 0);
-                rtmpCamera1.setExposure(exposure);
+//                rtmpCamera1.prepareAudio();
+//                rtmpCamera1.prepareVideo(width, height, fps, getAdjustedBitrate(), 0);
+//                rtmpCamera1.setExposure(exposure);
                 rtmpCamera1.startStream(url);
                 result.success("connected");
             } catch (Exception e) {
