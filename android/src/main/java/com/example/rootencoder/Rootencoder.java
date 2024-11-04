@@ -75,7 +75,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private int width = 1280;
     private int height = 720;
     private int exposure = 0;
-    private int fps = 60;
+    private int fps = 30;
     private String rtmpURL = null;
 
     @Override

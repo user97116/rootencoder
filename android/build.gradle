@@ -39,7 +39,8 @@ android {
     }
 
     dependencies {
-        implementation 'com.github.pedroSG94.RootEncoder:library:f0b9aa3fcb'
+        implementation 'com.github.pedroSG94.RootEncoder:library:2.5.4'
+//        implementation 'com.github.pedroSG94.RootEncoder:library:f0b9aa3fcb'
 //        implementation 'com.github.pedroSG94.RootEncoder:library:2.5.2'
 //        implementation 'com.github.pedroSG94.RootEncoder:extra-sources:2.5.2'
 //        implementation 'androidx.annotation:annotation:1.1.0'
