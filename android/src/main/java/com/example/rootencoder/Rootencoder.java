@@ -326,7 +326,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             try {
                 rtmpCamera1.startStream(url);
                 rtmpCamera1.getGlInterface().setRotation(0);
-                rtmpCamera1.getGlInterface().setStreamRotation(0);
+//                rtmpCamera1.getGlInterface().setStreamRotation(0);
                 result.success("connected");
             } catch (Exception e) {
                 Log.d("amar", e.getMessage());
