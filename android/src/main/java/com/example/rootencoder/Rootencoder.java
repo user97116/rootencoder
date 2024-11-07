@@ -46,6 +46,7 @@ import com.pedro.encoder.input.video.facedetector.FaceDetectorCallback;
 import com.pedro.encoder.utils.CodecUtil;
 import com.pedro.encoder.utils.gl.AspectRatioMode;
 import com.pedro.encoder.utils.gl.TranslateTo;
+import com.pedro.encoder.utils.gl.SizeCalculator;
 import com.pedro.library.rtmp.RtmpCamera1;
 import com.pedro.library.rtmp.RtmpCamera2;
 import com.pedro.library.view.OpenGlView;
@@ -164,7 +165,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
         switch (methodCall.method) {
             case "startPreview":
-                rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, 60, 0);
+                rtmpCamera1.startPreview(CameraHelper.Facing.BACK,  0);
                 break;
             case "changeResolution":
                 changeResolution(methodCall, result);
@@ -386,7 +387,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             Log.d("Valid", "yes");
             try {
                 if (!rtmpCamera1.isOnPreview()) {
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, fps, 0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK,  0);
                 }
             } catch (CameraOpenException e) {
                 Log.d("Camera can't attached", "yes");
@@ -400,7 +401,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             if (rtmpCamera1.isOnPreview()) rtmpCamera1.stopPreview();
             try {
                 if (!rtmpCamera1.isOnPreview())
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, fps, 0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, 0);
             } catch (Exception e) {
                 Log.d("surfaceChanged", "can't preview");
             }
