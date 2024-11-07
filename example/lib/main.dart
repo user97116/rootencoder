@@ -77,9 +77,8 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: Column(
             children: [
-              const SizedBox(
-                width: 300,
-                height: 300,
+              AspectRatio(
+                aspectRatio: 16 / 9,
                 child: TextView(),
               ),
               TextField(
