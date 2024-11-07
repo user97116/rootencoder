@@ -40,21 +40,21 @@ android {
 
     dependencies {
         // S4J
-        implementation "org.slf4j:slf4j-api:1.7.32"
+//        implementation "org.slf4j:slf4j-api:1.7.32"
         // Ktor Networking
-        implementation "io.ktor:ktor-client-core:3.0.0"
-        implementation "io.ktor:ktor-network:3.0.0"
-        implementation "io.ktor:ktor-network-tls:3.0.0"
-        implementation "io.ktor:ktor-io:3.0.0"
-        implementation "io.ktor:ktor-utils:3.0.0"
-//        implementation 'com.github.pedroSG94.RootEncoder:library:2.5.4'
+//        implementation "io.ktor:ktor-client-core:3.0.0"
+//        implementation "io.ktor:ktor-network:3.0.0"
+//        implementation "io.ktor:ktor-network-tls:3.0.0"
+//        implementation "io.ktor:ktor-io:3.0.0"
+//        implementation "io.ktor:ktor-utils:3.0.0"
+        implementation 'com.github.pedroSG94.RootEncoder:library:2.5.4'
         // RootEncoder
-        implementation files('libs/library-debug.aar')
-        implementation files('libs/common-release.aar')
-        implementation files('libs/encoder-debug.aar')
-        implementation files('libs/rtmp-release.aar')
-        implementation files('libs/udp-release.aar')
-        implementation files('libs/extra-sources-release.aar')
+//        implementation files('libs/library-debug.aar')
+//        implementation files('libs/common-release.aar')
+//        implementation files('libs/encoder-debug.aar')
+//        implementation files('libs/rtmp-release.aar')
+//        implementation files('libs/udp-release.aar')
+//        implementation files('libs/extra-sources-release.aar')
 //        implementation 'com.github.pedroSG94.RootEncoder:library:f0b9aa3fcb'
 //        implementation 'com.github.pedroSG94.RootEncoder:library:2.5.2'
 //        implementation 'com.github.pedroSG94.RootEncoder:extra-sources:2.5.2'

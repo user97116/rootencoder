@@ -164,9 +164,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
         switch (methodCall.method) {
-            case "startPreview":
-                rtmpCamera1.startPreview(CameraHelper.Facing.BACK,  0);
-                break;
             case "changeResolution":
                 changeResolution(methodCall, result);
                 break;
@@ -355,6 +352,10 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         String path = (String) methodCall.arguments;
         if (!rtmpCamera1.isRecording()) {
             try {
+                if(rtmpCamera1.isOnPreview()) {
+                    rtmpCamera1.stopPreview();
+                }
+                rtmpCamera1.startPreview(CameraHelper.Facing.BACK,width,height,fps, 0);
                 rtmpCamera1.prepareAudio();
                 rtmpCamera1.prepareVideo(width, height, fps, getAdjustedBitrate(), 0);
                 rtmpCamera1.setExposure(exposure);
@@ -387,7 +388,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             Log.d("Valid", "yes");
             try {
                 if (!rtmpCamera1.isOnPreview()) {
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK,  0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK,  width,height,fps, 0);
                 }
             } catch (CameraOpenException e) {
                 Log.d("Camera can't attached", "yes");
@@ -401,7 +402,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             if (rtmpCamera1.isOnPreview()) rtmpCamera1.stopPreview();
             try {
                 if (!rtmpCamera1.isOnPreview())
-                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK, 0);
+                    rtmpCamera1.startPreview(CameraHelper.Facing.BACK,width,height, fps,0);
             } catch (Exception e) {
                 Log.d("surfaceChanged", "can't preview");
             }
