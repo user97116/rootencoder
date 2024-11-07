@@ -324,11 +324,11 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         rtmpURL = url;
         if (!rtmpCamera1.isStreaming()) {
             try {
+                rtmpCamera1.startStream(url);
                 if(rtmpCamera1.isOnPreview()) {
                     rtmpCamera1.stopPreview();
                 }
                 rtmpCamera1.startPreview(CameraHelper.Facing.BACK,width,height,fps, 0);
-                rtmpCamera1.startStream(url);
                 result.success("connected");
             } catch (Exception e) {
                 Log.d("amar", e.getMessage());
