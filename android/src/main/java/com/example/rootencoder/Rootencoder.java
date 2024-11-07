@@ -457,7 +457,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void onConnectionStarted(@NonNull String s) {
         Log.d("amar", "onConnectionStarted " + s);
-
         if (eventSink != null) eventSink.success("Connecting");
     }
 
@@ -473,6 +472,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void onDisconnect() {
         Log.d("amar", "onDisconnect");
+        rtmpCamera1.getStreamClient().reTry(5000, "retry", null);
         if (eventSink != null) eventSink.success("Disconnected");
     }
 
