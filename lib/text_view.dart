@@ -12,9 +12,10 @@ class TextView extends StatefulWidget {
   State<StatefulWidget> createState() => _TextViewState();
 }
 
-class _TextViewState extends State<TextView> {
+class _TextViewState extends State<TextView> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (defaultTargetPlatform == TargetPlatform.android) {
       return AndroidView(
         viewType: 'com.amar/rootencoder',
@@ -31,6 +32,9 @@ class _TextViewState extends State<TextView> {
     print("id $id");
     // widget.onTextViewCreated!(TextViewController._(id));
   }
+  
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class TextViewController {
