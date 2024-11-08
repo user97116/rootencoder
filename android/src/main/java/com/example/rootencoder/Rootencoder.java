@@ -80,28 +80,15 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     private int exposure = 0;
     private int fps = 30;
     private String rtmpURL = null;
+    private ConnectivityManager connectivityManager;
 
     @Override
     public void onFlutterViewAttached(@NonNull View flutterView) {
         PlatformView.super.onFlutterViewAttached(flutterView);
         openGlView.getHolder().addCallback(this);
         openGlView.setOnTouchListener(this);
-    }
 
-    Rootencoder(Context context, BinaryMessenger messenger, int id) {
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
-        openGlView = new OpenGlView(context);
-        openGlView.setAspectRatioMode(AspectRatioMode.NONE);
-        rtmpCamera1 = new RtmpCamera2(openGlView, this);
-        methodChannel = new MethodChannel(messenger, "rootencoder");
-        methodChannel.setMethodCallHandler(this);
-        rtmpCamera1.setTimestampMode(TimestampMode.BUFFER, TimestampMode.BUFFER);
 
-//        if (rtmpCamera1.isVideoStabilizationEnabled()) {
-//            rtmpCamera1.enableVideoStabilization();
-//        }
-
-        eventChannel = new EventChannel(messenger, "connectionStream");
         eventChannel.setStreamHandler(new EventChannel.StreamHandler() {
             @Override
             public void onListen(Object o, EventChannel.EventSink event) {
@@ -114,7 +101,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             }
         });
 
-        eventChannel2 = new EventChannel(messenger, "connection");
         eventChannel2.setStreamHandler(new EventChannel.StreamHandler() {
             @Override
             public void onListen(Object o, EventChannel.EventSink event) {
@@ -126,8 +112,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
                 eventSink2 = null;
             }
         });
-
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), new ConnectivityManager.NetworkCallback() {
             @Override
@@ -145,6 +129,19 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
             }
         });
         rtmpCamera1.getStreamClient().setReTries(5000000);
+    }
+
+    Rootencoder(Context context, BinaryMessenger messenger, int id) {
+        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.dev);
+        openGlView = new OpenGlView(context);
+        openGlView.setAspectRatioMode(AspectRatioMode.NONE);
+        rtmpCamera1 = new RtmpCamera2(openGlView, this);
+        methodChannel = new MethodChannel(messenger, "rootencoder");
+        methodChannel.setMethodCallHandler(this);
+        rtmpCamera1.setTimestampMode(TimestampMode.BUFFER, TimestampMode.BUFFER);
+        eventChannel = new EventChannel(messenger, "connectionStream");
+        eventChannel2 = new EventChannel(messenger, "connection");
+        connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     private void setVideoCodecInit() {
@@ -392,6 +389,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
 
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+        Log.d("amar", "surfaceChanged");
         if (rtmpCamera1 != null) {
             try {
                 if (!rtmpCamera1.isOnPreview())
@@ -469,7 +467,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void onDisconnect() {
         Log.d("amar", "onDisconnect");
-        rtmpCamera1.getStreamClient().reTry(5000, "retry", null);
         if (eventSink != null) eventSink.success("Disconnected");
     }
 
