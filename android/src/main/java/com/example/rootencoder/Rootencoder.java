@@ -85,7 +85,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         PlatformView.super.onFlutterViewAttached(flutterView);
         openGlView.getHolder().addCallback(this);
         openGlView.setOnTouchListener(this);
-
     }
 
     Rootencoder(Context context, BinaryMessenger messenger, int id) {
@@ -350,11 +349,10 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         String path = (String) methodCall.arguments;
         if (!rtmpCamera1.isRecording()) {
             try {
-                rtmpCamera1.resetAudioEncoder();
-                rtmpCamera1.resetVideoEncoder();
-                rtmpCamera1.getGlInterface().setEncoderSize(width, height);
-                rtmpCamera1.getGlInterface().setRotation(0);
-                rtmpCamera1.getGlInterface().clearFilters();
+                Log.d("amar", String.valueOf(rtmpCamera1.getGlInterface().isRunning()));
+                rtmpCamera1.stopRecord();
+                rtmpCamera1.stopStream();
+
                 rtmpCamera1.prepareAudio();
                 rtmpCamera1.prepareVideo(width, height, fps, getAdjustedBitrate(), 0);
                 rtmpCamera1.setExposure(exposure);
