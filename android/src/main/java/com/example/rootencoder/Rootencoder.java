@@ -47,6 +47,7 @@ import com.pedro.encoder.utils.CodecUtil;
 import com.pedro.encoder.utils.gl.AspectRatioMode;
 import com.pedro.encoder.utils.gl.TranslateTo;
 import com.pedro.encoder.utils.gl.SizeCalculator;
+import com.pedro.library.generic.GenericCamera2;
 import com.pedro.library.generic.GenericStream;
 import com.pedro.library.rtmp.RtmpCamera1;
 import com.pedro.library.rtmp.RtmpCamera2;
@@ -349,10 +350,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         String path = (String) methodCall.arguments;
         if (!rtmpCamera1.isRecording()) {
             try {
-                Log.d("amar", String.valueOf(rtmpCamera1.getGlInterface().isRunning()));
-                rtmpCamera1.stopRecord();
-                rtmpCamera1.stopStream();
-
                 rtmpCamera1.prepareAudio();
                 rtmpCamera1.prepareVideo(width, height, fps, getAdjustedBitrate(), 0);
                 rtmpCamera1.setExposure(exposure);
@@ -396,7 +393,6 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         if (rtmpCamera1 != null) {
-            if (rtmpCamera1.isOnPreview()) rtmpCamera1.stopPreview();
             try {
                 if (!rtmpCamera1.isOnPreview())
                     rtmpCamera1.startPreview(CameraHelper.Facing.BACK, width, height, fps, 0);

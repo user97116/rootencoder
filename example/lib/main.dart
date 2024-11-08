@@ -97,7 +97,7 @@ class _MyAppState extends State<MyApp> {
               ),
               TextButton(
                 onPressed: () {
-                  methodChannel.invokeMethod("startStream", urlController.text);
+                  methodChannel.invokeMethod("startStream", "rtmp://x.rtmp.youtube.com/live2/uvh4-gx6m-gxbr-pkpm-431j");
                 },
                 child: const Text("Start stream"),
               ),
