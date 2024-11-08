@@ -47,6 +47,7 @@ import com.pedro.encoder.utils.CodecUtil;
 import com.pedro.encoder.utils.gl.AspectRatioMode;
 import com.pedro.encoder.utils.gl.TranslateTo;
 import com.pedro.encoder.utils.gl.SizeCalculator;
+import com.pedro.library.generic.GenericStream;
 import com.pedro.library.rtmp.RtmpCamera1;
 import com.pedro.library.rtmp.RtmpCamera2;
 import com.pedro.library.view.OpenGlView;
@@ -324,9 +325,7 @@ public class Rootencoder implements PlatformView, MethodCallHandler, SurfaceHold
         rtmpURL = url;
         if (!rtmpCamera1.isStreaming()) {
             try {
-                rtmpCamera1.getGlInterface().setEncoderSize(width,height);
                 rtmpCamera1.startStream(url);
-                rtmpCamera1.getGlInterface().setEncoderSize(width,height);
                 result.success("connected");
             } catch (Exception e) {
                 Log.d("amar", e.getMessage());

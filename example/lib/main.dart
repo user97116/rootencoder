@@ -69,6 +69,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     print(urlController.text);
+    permsi();
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(

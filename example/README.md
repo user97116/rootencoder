@@ -1,6 +1,6 @@
 # rootencoder_example
 
-Demonstrates how to use the rootencoder plugin.
+A new Flutter project.
 
 ## Getting Started
 
